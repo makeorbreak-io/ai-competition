@@ -1,0 +1,23 @@
+#!/usr/bin/env ruby
+
+require "zeitwerk"
+
+loader = Zeitwerk::Loader.new
+loader.push_dir(File.join(__dir__, "../lib"))
+loader.setup
+
+players =
+  ARGV
+    .tap { |filenames| raise filenames.length.to_s if filenames.length != 2 }
+    .map { |filename| File.read(filename) }
+    .each_with_index
+    .map { |source, idx| Engine::Player.new(id: idx, source_code: source, game: Games::Bomberman) }
+
+state =
+  File
+    .open("boards/bomberman/example.txt")
+    .then(&Games::Bomberman::State.method(:parse))
+
+Games::Bomberman
+  .then(&Engine::Runner.method(:new))
+  .run(state, players) { |actions, state| puts state.to_s; sleep 1 }
