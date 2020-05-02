@@ -1,0 +1,11 @@
+500
+0 0 1 0
+w    w    w    w    w    w    w    w    w
+w    p0o  .    rc1  .    .    .    .    w
+w    .    w    rc1  w    .    w    .    w
+w    rc1  rc1  .    .    c5   .    .    w
+w    .    w    .    w    .    w    .    w
+w    .    .    c5   .    .    rc1  rc1  w
+w    .    w    .    w    rc1  w    .    w
+w    .    .    .    .    rc1  .    p1o  w
+w    w    w    w    w    w    w    w    w
