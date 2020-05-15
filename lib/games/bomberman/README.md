@@ -164,7 +164,7 @@ cleanup phase of the following turn.
 
 Bombs that have their `timer` attribute at zero will explode now.
 
-For each cardinal direction, starting from and inclusing the exploding bomb's
+For each cardinal direction, starting from and including the exploding bomb's
 position, mark a number of squares equal to the bomb's `range` attribute,
 stopping if you reach a square with a destructible rock, an indestructible
 wall, or another bomb. Do not place explosion markers in squares with
