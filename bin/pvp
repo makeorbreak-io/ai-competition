@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 
+$stdout.sync = true
 require File.join(__dir__, "../lib/main")
+require "dotenv/load"
 
 players =
   ARGV

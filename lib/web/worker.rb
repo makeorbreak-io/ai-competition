@@ -1,3 +1,5 @@
+require "httparty"
+
 module Web
   class Worker
     attr_reader :game
@@ -17,28 +19,30 @@ module Web
       )
     end
 
-    Job.poll do |job, control|
-      players = job[:payload][:players].each_with_index.map do |source, idx|
-        Engine::Player.new(
-          id: idx,
-          source_code: source,
-          game: game,
-        )
+    def run!
+      Job.poll do |job, control|
+        players = job[:payload][:players].each_with_index.map do |source, idx|
+          Engine::Player.new(
+            id: idx,
+            source_code: source,
+            game: game,
+          )
+        end
+
+        state = game::State.parse(job[:payload][:state])
+
+        log = []
+
+        Engine::Runner.new(game).run(state, players) do |actions, state|
+          control.ping
+          log << [actions, state]
+        end
+
+        Job.store_results(job[:id], log)
+        notify_webhook(job)
+
+        control.finish
       end
-
-      state = game::State.parse(job[:payload][:state])
-
-      log = []
-
-      Engine::Runner.new(game).run(state, players) do |actions, state|
-        control.ping
-        log << [actions, state]
-      end
-
-      Job.store_results(job, log)
-      notify_webhook(job)
-
-      control.finish
     end
   end
 end

@@ -19,12 +19,6 @@ module Web
       bucket.object(job[:id]).put(acl: "private", body: job.to_json)
     end
 
-    def store_results(id, results)
-      job = fetch(id).merge(results: results)
-
-      store(job)
-    end
-
     def enqueue(job)
       store(job)
       queue.send_message(message_body: job[:id])
