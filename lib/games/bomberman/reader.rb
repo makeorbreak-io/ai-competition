@@ -39,7 +39,7 @@ module Games
 
         case t
         when 'b'
-          #        timer     radius   ids
+          #        timer     range   ids
           s.scan(/([0-9]+),([0-9]+),([&0-9]+)/)
 
           Entities::Bomb.new(s[1].to_i, s[2].to_i, s[3].split("&").map(&:to_i))

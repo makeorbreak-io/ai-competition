@@ -40,13 +40,13 @@ module Games::Bomberman
     def test_bombs
       entities_by_class[Entities::Bomb][0].tap do |bomb|
         assert_equal 2, bomb.timer
-        assert_equal 3, bomb.radius
+        assert_equal 3, bomb.range
         assert_equal [0, 3], bomb.player
       end
 
       entities_by_class[Entities::Bomb][1].tap do |bomb|
         assert_equal 5, bomb.timer
-        assert_equal 6, bomb.radius
+        assert_equal 6, bomb.range
         assert_equal [7], bomb.player
       end
     end

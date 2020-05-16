@@ -29,7 +29,7 @@ module Games
       def self.entity_to_s(agent)
         case agent
         when Entities::Bomb
-          "b#{agent.timer},#{agent.radius},#{agent.player.sort.join("&")}"
+          "b#{agent.timer},#{agent.range},#{agent.player.sort.join("&")}"
         when Entities::Coin
           "c#{agent.points}"
         when Entities::MoreBombs

@@ -61,8 +61,8 @@ module Games
           board[position].map(&:class).uniq
         end
 
-        def new_bomb(timer, radius, player_id)
-          Entities::Bomb.new(timer, radius, Array(player_id))
+        def new_bomb(timer, range, player_id)
+          Entities::Bomb.new(timer, range, Array(player_id))
         end
 
         def new_explosion
@@ -148,7 +148,7 @@ module Games
         def merge_bombs(board, bombs)
           bombs.each { |b| remove_object(board, b) }
 
-          place_object(board, bombs.first.position, new_bomb(bombs.map(&:timer).min, bombs.map(&:radius).max, bombs.map(&:player).flatten.uniq))
+          place_object(board, bombs.first.position, new_bomb(bombs.map(&:timer).min, bombs.map(&:range).max, bombs.map(&:player).flatten.uniq))
         end
 
         def bomb_explosion(board)
@@ -172,7 +172,7 @@ module Games
           processed_positions = new_bombs.map(&:position)
 
           rays = new_bombs.product(DIRECTIONS)
-            .map { |(bomb, direction)| Ray.new(bomb.position, direction, bomb.radius) }
+            .map { |(bomb, direction)| Ray.new(bomb.position, direction, bomb.range) }
 
           Enumerator.new do |y|
             while rays.any?
@@ -186,7 +186,7 @@ module Games
                 processed_positions.push(ray.position)
 
                 rays += bombs(board, ray.position).product(DIRECTIONS)
-                  .map { |bomb, direction| Ray.new(bomb.position, direction, bomb.radius) }
+                  .map { |bomb, direction| Ray.new(bomb.position, direction, bomb.range) }
               end
 
               next if (object_types_at(board, ray.position) & [Entities::Player, Entities::Rock]).any?

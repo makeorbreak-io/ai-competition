@@ -39,7 +39,7 @@ module Games
             when Entities::Player
               { "type": "player", id: mask_player_id[entity.id], alive: entity.alive, points: entity.points, simultaneous_bombs: entity.simultaneous_bombs, bomb_range: entity.bomb_range }
             when Entities::Bomb
-              { "type": "bomb", timer: entity.timer, radius: entity.radius, player: mask_player_id[entity.player] }
+              { "type": "bomb", timer: entity.timer, range: entity.range, player: mask_player_id[entity.player] }
             when Entities::Explosion
               { "type": "explosion" }
             end

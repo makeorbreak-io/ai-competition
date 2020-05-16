@@ -22,9 +22,9 @@ module Loader
     when 'b'
       timer = s.scan(/[0-9]+/).to_i
       s.scan(/,/)
-      radius = s.scan(/[0-9]+/).to_i
+      range = s.scan(/[0-9]+/).to_i
 
-      Bomb.new(timer, radius)
+      Bomb.new(timer, range)
     when '.'
       nil
     else
@@ -42,7 +42,7 @@ module Loader
   def self.nacs(agent)
     case agent
       when Bomb
-        "b#{agent.timer},#{agent.radius}"
+        "b#{agent.timer},#{agent.range}"
       when Wall
         "w"
       when Rock
