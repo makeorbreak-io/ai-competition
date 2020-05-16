@@ -7,8 +7,8 @@ module Games
       :height,
       :turn,
       :turns_left,
+      :entities,
       :board,
-      :score,
       keyword_init: true
     )
       def self.parse(io)
@@ -28,7 +28,6 @@ module Games
           height: height,
           turn: turn,
           turns_left: turns_left,
-          score: score.transform_keys(&mask_player_id),
           board: board.map { |row| row.map { |cell| cell.map { |entity|
             case entity
             when Entities::Rock
@@ -38,7 +37,7 @@ module Games
             when Entities::Coin
               { "type": "coin", points: entity.points }
             when Entities::Player
-              { "type": "player", id: mask_player_id[entity.id], alive: entity.alive }
+              { "type": "player", id: mask_player_id[entity.id], alive: entity.alive, points: entity.points, simultaneous_bombs: entity.simultaneous_bombs, bomb_range: entity.bomb_range }
             when Entities::Bomb
               { "type": "bomb", timer: entity.timer, radius: entity.radius, player: mask_player_id[entity.player] }
             when Entities::Explosion

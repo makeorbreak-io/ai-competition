@@ -15,50 +15,50 @@ module Games
           end
         end
 
-        def explosions(x, position = nil)
-          agents(x, position, Entities::Explosion)
+        def explosions(board, position = nil)
+          agents(board, position, Entities::Explosion)
         end
 
-        def walls(x, position = nil)
-          agents(x, position, Entities::Wall)
+        def walls(board, position = nil)
+          agents(board, position, Entities::Wall)
         end
 
-        def players(x, position = nil)
-          agents(x, position, Entities::Player)
+        def players(board, position = nil)
+          agents(board, position, Entities::Player)
         end
 
-        def bombs(x, position = nil)
-          agents(x, position, Entities::Bomb)
+        def bombs(board, position = nil)
+          agents(board, position, Entities::Bomb)
         end
 
-        def rocks(x, position = nil)
-          agents(x, position, Entities::Rock)
+        def rocks(board, position = nil)
+          agents(board, position, Entities::Rock)
         end
 
-        def rewards(x, position = nil)
-          agents(x, position, Entities::Coin) +
-            agents(x, position, Entities::MoreBombs) +
-            agents(x, position, Entities::StrongerBombs)
+        def rewards(board, position = nil)
+          agents(board, position, Entities::Coin) +
+            agents(board, position, Entities::MoreBombs) +
+            agents(board, position, Entities::StrongerBombs)
         end
 
-        def kill_player(player, score)
+        def kill_player(player)
           player.alive = false
-          score[player.id] -= 100
+          player.points -= 100
         end
 
         def bomb_decrease_timer(bomb)
           bomb.timer -= 1
         end
 
-        def move_player(x, movement)
-          player = players(x).find { |p| p.id == movement.player_id }
-          remove_object(x, player)
+        def move_player(board, movement)
+          player = players(board).find { |p| p.id == movement.player_id }
+          remove_object(board, player)
 
-          place_object(x, movement.to, player)
+          place_object(board, movement.to, player)
         end
 
-        def object_types_at(x, position)
-          x[position].map(&:class).uniq
+        def object_types_at(board, position)
+          board[position].map(&:class).uniq
         end
 
         def new_bomb(timer, radius, player_id)
@@ -69,12 +69,12 @@ module Games
           Entities::Explosion.new
         end
 
-        def place_object(x, position, object)
-          x[position] << object.positioned_at(position)
+        def place_object(board, position, object)
+          board[position] << object.positioned_at(position)
         end
 
-        def remove_object(x, object)
-          x[object.position]
+        def remove_object(board, object)
+          board[object.position]
             .reject! { |agent| agent.object_id == object.object_id }
         end
 
@@ -84,8 +84,8 @@ module Games
 
           cleanup(board)
           bomb_tick(board)
-          action_execution(board, actions, state.score)
-          bomb_explosion(board, state.score)
+          action_execution(board, actions)
+          bomb_explosion(board)
 
           State.new(
             width: state.width,
@@ -93,7 +93,6 @@ module Games
             turn: state.turn + 1,
             turns_left: state.turns_left - 1,
             board: to_board(board.transform_values(&:compact)),
-            score: state.score,
           )
         end
 
@@ -109,7 +108,7 @@ module Games
           end
         end
 
-        def action_execution(board, actions, score)
+        def action_execution(board, actions)
           # player movement
           unwalkable_objects = [
             Entities::Wall,
@@ -127,7 +126,7 @@ module Games
             capturers = players(board, reward.position)
 
             if capturers.any?
-              capturers.each { |player| apply_reward(board, score, reward, player) }
+              capturers.each { |player| apply_reward(board, reward, player) }
               remove_object(board, reward)
             end
           end
@@ -152,9 +151,9 @@ module Games
           place_object(board, bombs.first.position, new_bomb(bombs.map(&:timer).min, bombs.map(&:radius).max, bombs.map(&:player).flatten.uniq))
         end
 
-        def bomb_explosion(board, score)
+        def bomb_explosion(board)
           explode_bombs(board).each do |position|
-            explode(board, position, score)
+            explode(board, position)
           end
         end
 
@@ -168,8 +167,8 @@ module Games
           end
         end
 
-        def explode_bombs(x)
-          new_bombs = bombs(x).select { |bomb| bomb.timer == 0 }
+        def explode_bombs(board)
+          new_bombs = bombs(board).select { |bomb| bomb.timer == 0 }
           processed_positions = new_bombs.map(&:position)
 
           rays = new_bombs.product(DIRECTIONS)
@@ -179,48 +178,48 @@ module Games
             while rays.any?
               ray = rays.pop
 
-              next if walls(x, ray.position).any?
+              next if walls(board, ray.position).any?
 
               y.yield(ray.position)
 
               unless processed_positions.include?(ray.position)
                 processed_positions.push(ray.position)
 
-                rays += bombs(x, ray.position).product(DIRECTIONS)
+                rays += bombs(board, ray.position).product(DIRECTIONS)
                   .map { |bomb, direction| Ray.new(bomb.position, direction, bomb.radius) }
               end
 
-              next if (object_types_at(x, ray.position) & [Entities::Player, Entities::Rock]).any?
+              next if (object_types_at(board, ray.position) & [Entities::Player, Entities::Rock]).any?
 
               rays.push(ray.next) unless ray.ttl.zero?
             end
           end.to_a.uniq
         end
 
-        def apply_reward(x, score, reward, player)
+        def apply_reward(board, reward, player)
           case reward
           when Entities::Coin
-            score[player.id] += reward.points
+            player.points += reward.points
           when Entities::StrongerBombs
           when Entities::MoreBombs
           end
         end
 
-        def explode(x, position, score)
-          rocks(x, position).each do |rock|
+        def explode(board, position)
+          rocks(board, position).each do |rock|
             if rock.reward
-              place_object(x, rock.position, rock.reward)
+              place_object(board, rock.position, rock.reward)
             end
-            remove_object(x, rock)
+            remove_object(board, rock)
           end
 
-          players(x, position)
-            .each { |player| kill_player(player, score) }
+          players(board, position)
+            .each { |player| kill_player(player) }
 
-          bombs(x, position)
-            .each { |bomb| remove_object(x, bomb) }
+          bombs(board, position)
+            .each { |bomb| remove_object(board, bomb) }
 
-          place_object(x, position, new_explosion)
+          place_object(board, position, new_explosion)
         end
 
         def from_board(board)
