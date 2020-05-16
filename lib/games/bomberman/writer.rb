@@ -8,8 +8,10 @@ module Games
 
         io.puts state.turns_left
 
-        cells = state.board.map do |row|
-          row.map { |agents| cell_to_s(agents) }
+        cells = Array.new(state.height) do |row|
+          Array.new(state.width) do |col|
+            cell_to_s(state.entities.select { |e| e.position == [row, col] })
+          end
         end
 
         width = cells.transpose.map { |column| column.map(&:size).max }

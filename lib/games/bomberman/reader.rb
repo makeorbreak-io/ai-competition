@@ -22,7 +22,6 @@ module Games
           height: lines.size,
           turn: 0,
           turns_left: turns,
-          board: board_cells,
           entities: board_cells.flatten,
         )
       end
