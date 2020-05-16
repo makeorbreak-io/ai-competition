@@ -1,44 +1,13 @@
-require "securerandom"
 require "aws-sdk-s3"
 require "aws-sdk-sqs"
 
-class Job
-  class Control
-    def initialize(poller, message)
-      @poller = poller
-      @message = message
-    end
-
-    def ping
-      @poller.change_message_visibility_timeout(@message, 60)
-    end
-
-    def finish
-      @poller.delete_message(@message)
-    end
-  end
-
-  class <<self
-    class NotFound < Exception; end
-
-    def parse(str)
-      type, payload, callback_url, auth_token = JSON.parse(str).values_at("type", "payload", "callback_url", "auth_token")
-
-      {
-        id: SecureRandom.uuid,
-        type: type,
-        payload: JSON.generate(payload),
-        status: "new",
-        callback_url: callback_url,
-        auth_token: auth_token,
-      }
-    end
-
+module Web
+  module JobAWS
     def poll(&block)
       poller = Aws::SQS::QueuePoller.new(ENV.fetch("JOB_QUEUE_URL"))
 
       poller.poll do |message|
-        block.call(fetch(message.body), Control.new(poller, message))
+        block.call(fetch(message.body), JobControl.new(poller, message))
       end
     end
 
