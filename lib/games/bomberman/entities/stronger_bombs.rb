@@ -1,8 +1,8 @@
 module Games
   module Bomberman
     module Entities
-      class StrongerBombs < Struct.new(:position)
-        include Positioned
+      class StrongerBombs
+        include Components::Positioned
       end
     end
   end

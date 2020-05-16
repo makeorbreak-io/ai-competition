@@ -1,8 +1,8 @@
 module Games
   module Bomberman
     module Entities
-      class Explosion < Struct.new(:position)
-        include Positioned
+      class Explosion
+        include Components::Positioned
       end
     end
   end

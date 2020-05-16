@@ -1,8 +1,8 @@
 module Games
   module Bomberman
     module Entities
-      class Wall < Struct.new(:position)
-        include Positioned
+      class Wall
+        include Components::Positioned
       end
     end
   end
