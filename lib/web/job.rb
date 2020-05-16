@@ -4,8 +4,9 @@ require "securerandom"
 
 module Web
   class Job
+    class NotFound < Exception; end
+
     class <<self
-      class NotFound < Exception; end
 
       def from_http(body)
         type, payload, callback_url, auth_token = JSON.parse(body).values_at("type", "payload", "callback_url", "auth_token")

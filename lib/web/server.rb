@@ -23,7 +23,7 @@ module Web
     get "/jobs/:id" do
       job_id = params[:id]
 
-      [200, Job.fetch(job_id)]
+      [200, Job.fetch(job_id).to_json]
     rescue Job::NotFound
       404
     end
