@@ -18,6 +18,8 @@ module Web
       Job.enqueue(job)
 
       [201, job.to_json]
+    rescue Web::Schema::Error => e
+      [400, { error: e.to_s }.to_json]
     end
 
     get "/jobs/:id" do

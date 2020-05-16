@@ -32,7 +32,7 @@ module Web
     end
 
     def queue
-      client = Aws::S3::Client.new(region: ENV.fetch("JOB_STORAGE_REGION"))
+      client = Aws::S3::Client.new(region: ENV.fetch("JOB_QUEUE_REGION"))
       @queue = Aws::SQS::Queue.new(ENV.fetch("JOB_QUEUE_URL"), client)
     end
   end

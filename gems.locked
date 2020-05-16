@@ -58,6 +58,8 @@ GEM
     rack (2.2.2)
     rack-protection (2.0.8.1)
       rack
+    rack-test (1.1.0)
+      rack (>= 1.0, < 3)
     rake (13.0.1)
     ruby2_keywords (0.0.2)
     sinatra (2.0.8.1)
@@ -85,6 +87,7 @@ DEPENDENCIES
   m
   minitest
   parslet
+  rack-test
   rake
   rlua!
   sinatra
