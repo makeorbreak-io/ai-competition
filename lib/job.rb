@@ -10,6 +10,7 @@ class Job
     end
 
     def ping
+      @poller.change_message_visibility_timeout(@message, 60)
     end
 
     def finish
@@ -45,8 +46,18 @@ class Job
       parse(bucket.object(id).get.body.read)
     end
 
-    def enqueue(job)
+    def store(job)
       bucket.object(job[:id]).put(acl: "private", body: job.to_json)
+    end
+
+    def store_results(id, results)
+      job = fetch(id).merge(results: results)
+
+      store(job)
+    end
+
+    def enqueue(job)
+      store(job)
       queue.send_message(message_body: job[:id])
     end
 

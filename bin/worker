@@ -37,7 +37,7 @@ Job.poll do |job, control|
     log << [actions, state]
   end
 
-  # persist log
+  Job.store_results(job, log)
   notify_webhook(job)
 
   control.finish
