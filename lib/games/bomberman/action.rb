@@ -32,11 +32,11 @@ module Games
       def self.build(state, player_id, action)
         case action
         when "bomb"
-          position = state.players.find { |player| player.id == player_id }.position
+          position = state.entities.find { |entity| entity.is_a?(Entities::Player) && entity.id == player_id }.position
 
           DropBomb.new(player_id, position)
         when "up", "down", "left", "right"
-          position = state.players.find { |player| player.id == player_id }.position
+          position = state.entities.find { |entity| entity.is_a?(Entities::Player) && entity.id == player_id }.position
           direction = DIRECTIONS.fetch(action.to_sym)
 
           Move.new(

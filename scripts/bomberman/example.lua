@@ -1,11 +1,7 @@
 function playerposition(local_state, id)
-  for i, row in pairs(local_state["board"]) do
-    for j, cells in pairs(row) do
-      for c, cell in pairs(cells) do
-        if cell["type"] == "player" and cell["id"] == id then
-          return {i, j}
-        end
-      end
+  for i, player in pairs(local_state["entities_by_type"]["player"]) do
+    if player["id"] == id then
+      return player["position"]
     end
   end
 end
@@ -13,7 +9,7 @@ end
 function empty_move(local_state, position)
   for i, p in pairs({{-1,0}, {1,0}, {0,-1}, {0,1}}) do
     free = true
-    for c, cell in pairs(local_state["board"][position[1] + p[1]][position[2] + p[2]]) do
+    for c, cell in pairs(local_state["entities_by_position"][{position[1] + p[1], position[2] + p[2]}] or {}) do
       ctype = cell["type"]
       if ctype == "wall" or ctype == "rock" or ctype == "bomb" then
         free = false
@@ -30,8 +26,8 @@ end
 
 function next_to_(local_state, position, ctype)
   for i, p in pairs({{0, 0}, {-1,0}, {1,0}, {0,-1}, {0,1}}) do
-    for c, cell in pairs(local_state["board"][position[1] + p[1]][position[2] + p[2]]) do
-      if cell["type"] == ctype then
+    for c, entity in pairs(local_state["entities_by_position"][{position[1] + p[1], position[2] + p[2]}] or {}) do
+      if entity["type"] == ctype then
         return p
       end
     end
@@ -42,12 +38,10 @@ end
 
 
 function placed_bomb(local_state, id)
-  for i, row in pairs(local_state["board"]) do
-    for j, cells in pairs(row) do
-      for c, cell in pairs(cells) do
-        if cell["type"] == "bomb" and cell["player"] == id then
-          return {i, j, cell}
-        end
+  for i, bomb in pairs(local_state["entities_by_type"]["bomb"] or {}) do
+    for c, owners in pairs(bomb["players"]) do
+      if c == id then
+        return bomb
       end
     end
   end

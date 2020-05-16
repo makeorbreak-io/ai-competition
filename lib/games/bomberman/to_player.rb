@@ -1,3 +1,5 @@
+require "active_support/core_ext/hash/keys"
+
 module Games::Bomberman
   module ToPlayer
     def self.to_player(state:, id:)
@@ -15,7 +17,7 @@ module Games::Bomberman
         entities: entities,
         entities_by_type: entities.group_by { |e| e[:type] },
         entities_by_position: entities.group_by { |e| e[:position] },
-      }
+      }.deep_transform_keys { |k| k.is_a?(Symbol) ? k.to_s : k }
     end
 
     def self.mask_player_id(state, id, player_id)
