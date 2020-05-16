@@ -1,11 +1,4 @@
-require "zeitwerk"
-
-loader = Zeitwerk::Loader.new
-loader.push_dir(File.join(__dir__, "../.."))
-loader.setup
-
-require "minitest/autorun"
-require "loader"
+require File.join(__dir__, "../../test_helper")
 
 module Games::Bomberman
   class ToPlayerTest < Minitest::Test

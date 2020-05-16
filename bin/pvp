@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require File.join(__dir__, "../lib/zeitwerk")
+require File.join(__dir__, "../lib/main")
 
 players =
   ARGV
@@ -11,7 +11,7 @@ players =
 
 state =
   File
-    .open("boards/bomberman/example.txt")
+    .open("states/bomberman/example.txt")
     .then(&Games::Bomberman::State.method(:parse))
 
 Games::Bomberman
