@@ -1,0 +1,28 @@
+#!/usr/bin/env ruby
+
+$stdout.sync = true
+require File.join(__dir__, "../lib/main")
+require "dotenv/load"
+require "httparty"
+
+state = File.read(ARGV[0])
+
+# just validating that it loads
+Games::Bomberman::State.parse(StringIO.new(state))
+
+players =
+  ARGV[1..]
+    .tap { |filenames| raise filenames.length.to_s if filenames.length != 2 }
+    .map { |filename| File.read(filename) }
+
+puts HTTParty.post(
+  "#{ENV.fetch("BASE_URL")}/jobs",
+  body: {
+    type: "bomberman.match",
+    payload: { players: players, state: state },
+  }.to_json,
+  headers: {
+    "Content-Type": "aplication/json",
+    "Authorization": "Bearer #{ENV.fetch("AUTHORIZATION_TOKEN")}",
+  },
+)["id"]

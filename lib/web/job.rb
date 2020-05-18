@@ -3,21 +3,28 @@ require "json"
 require "securerandom"
 
 module Web
+  Body = Web::Schema.build(
+    type: "bomberman.match",
+    payload: {
+      players: [String],
+      state: ->(path, state) do
+        Games::Bomberman::State.parse(StringIO.new(state))
+        []
+      rescue
+        Web::Schema.error(path, "valid game state", "something else")
+      end,
+    },
+    callback: Schema.either(nil, { url: String, authorization: String }),
+  )
+
   class Job
     class NotFound < Exception; end
 
     class <<self
-
       def from_http(body)
-        type, payload, callback_url, auth_token = JSON.parse(body).values_at("type", "payload", "callback_url", "auth_token")
+        params = Body[JSON.parse(body).deep_symbolize_keys]
 
-        {
-          id: SecureRandom.uuid,
-          type: type,
-          payload: JSON.generate(payload),
-          callback_url: callback_url,
-          auth_token: auth_token,
-        }
+        params.merge(id: SecureRandom.uuid)
       end
 
       def parse(str)

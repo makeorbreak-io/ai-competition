@@ -4,17 +4,17 @@ $stdout.sync = true
 require File.join(__dir__, "../lib/main")
 require "dotenv/load"
 
+state =
+  File
+    .open(ARGV[0])
+    .then(&Games::Bomberman::State.method(:parse))
+
 players =
-  ARGV
+  ARGV[1..]
     .tap { |filenames| raise filenames.length.to_s if filenames.length != 2 }
     .map { |filename| File.read(filename) }
     .each_with_index
     .map { |source, idx| Engine::Player.new(id: idx, source_code: source, game: Games::Bomberman) }
-
-state =
-  File
-    .open("states/bomberman/example.txt")
-    .then(&Games::Bomberman::State.method(:parse))
 
 Games::Bomberman
   .then(&Engine::Runner.method(:new))

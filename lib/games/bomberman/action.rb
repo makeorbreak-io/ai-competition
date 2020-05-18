@@ -9,23 +9,23 @@ module Games
       }.freeze
 
       class DropBomb < Struct.new(:player_id, :at)
-        def to_json
+        def to_json(*)
           {
             "action" => "bomb",
             "at" => at,
             "player_id" => player_id,
-          }
+          }.to_json
         end
       end
 
       class Move < Struct.new(:player_id, :from, :to)
-        def to_json
+        def to_json(*)
           {
             "action" => "move",
             "from" => from,
             "player_id" => player_id,
             "to" => to,
-          }
+          }.to_json
         end
       end
 

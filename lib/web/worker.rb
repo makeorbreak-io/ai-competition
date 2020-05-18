@@ -9,12 +9,14 @@ module Web
     end
 
     def notify_webhook(job)
+      return if job[:callback].nil?
+
       HTTParty.post(
         job[:callback][:url],
-        job,
-        {
+        body: job.to_json,
+        headers: {
           "Content-Type": "aplication/json",
-          "Secret": job[:callback][:secret],
+          "Authorization": "Bearer #{job[:callback][:authorization]}",
         }
       )
     end
@@ -29,7 +31,7 @@ module Web
           )
         end
 
-        state = game::State.parse(job[:payload][:state])
+        state = game::State.parse(StringIO.new(job[:payload][:state]))
 
         log = []
 
